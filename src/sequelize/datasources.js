@@ -11,6 +11,12 @@ raw_models.forEach(model => {
     });
 });
 
-export const sequelizeDatasources = {
-    postgresDatasource: sequelize
-}
+const sequelize_prefix = process.env.SEQUELIZE_PREFIX || 'pg';
+
+const datasources = Object.fromEntries(
+    Object.entries(sequelize.models).map(([modelName, model]) => {
+        return [`${sequelize_prefix}${modelName}DataSource`, model];
+    })
+);
+
+export { datasources as sequelizeDatasources };
