@@ -6,6 +6,7 @@ import { mongoConnect } from "@/mongodb/connection";
 import { mongoDatasources } from "@/mongodb/datasources";
 import { sequelizeConnect } from '@/sequelize/connection';
 import { sequelizeDatasources } from '@/sequelize/datasources';
+import { getSession } from "@/lib/session/fromReq";
 
 
 const resolversArray = loadFilesSync('src/graphql/**/*.resolver.js');
@@ -24,7 +25,8 @@ const handler = startServerAndCreateNextHandler(server, {
         ds: {
             ...mongoDatasources,
             ...sequelizeDatasources
-        }
+        },
+        session: await getSession(req, res),
     })
 });
 
