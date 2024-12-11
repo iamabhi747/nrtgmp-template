@@ -269,6 +269,71 @@ module.exports = {
 
 To prevent naming clashes between similar names, there is a prefix for Sequelize datasources which can be changed through the environment variable `SEQUELIZE_PREFIX`. The default prefix is "pg".
 
+### Support for MySQL, MariaDB, SQLite, and Microsoft SQL Server
+
+As Sequelize supports multiple databases, the setup for MySQL, MariaDB, SQLite, and Microsoft SQL Server is similar to PostgreSQL. The difference will be changing the environment variables and the database dialect in the Sequelize configuration.
+
+## Managing Session Data
+
+NRTGMP uses Iron Session for managing session data. The session data is stored in cookies and encrypted using Iron. The session data can be accessed in API routes, GraphQL resolvers and Sever components & actions.
+
+### Setting Up Session
+
+To start using session data, add session fields in the `defaultSession` object in `/src/lib/session/options.js`. You can also customize Iron session options in the `serverOptions` object.
+
+```javascript
+// src/lib/session/options.js
+
+export const serverOptions = {
+    cookieName: process.env.SESSION_COOKIE_NAME || "NSESSION",
+    password: process.env.SESSION_SECRET,
+    cookieOptions: {
+        secure: process.env.NODE_ENV === "production",
+    },
+};
+
+export const defaultSession = {
+    user: "Guest",
+};
+```
+
+### Accessing Session Data
+
+If the session is not set, the default session data will be returned. You can modify the session data directly like a JavaScript object and call `session.save()` to save the changes.
+
+#### In API Routes, Server Components, and Actions
+
+Session data is accessed in API routes, server components, and actions using the `getSession` function from `@/lib/session/fromCookies`.
+
+```javascript
+import { getSession } from '@/lib/session/fromCookies';
+
+export async function Something(request) {
+    const session = await getSession();
+    session.user = "New User";
+    await session.save();
+}
+```
+
+In this example, `Something` can be an API route, server component, or action.
+
+#### In GraphQL Resolvers
+
+Session data is accessed in GraphQL resolvers using the `session` object from `context`.
+
+```javascript
+// src/graphql/user/user.resolver.js
+module.exports = { 
+    Query: {
+        users: async (parent, args, { session }) => {
+            session.user = "New User";
+            await session.save();
+        }
+    }
+}
+```
+
+
 ## Shadcn Components
 
 Shadcn components are set up in this repository. More information on how to use them will be added later.
