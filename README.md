@@ -20,17 +20,22 @@ This repository is a robust base template for building modern web applications u
 
 ## Getting Started
 
-First, clone the repository and install the dependencies:
+First, install the `create-nrtgmp-app` package globally:
 
 ```bash
-git clone <repository-url>
-cd nrtgmp-template
-npm install
+npm install -g create-nrtgmp-app
 ```
 
-Then, run the development server:
+Then, create a new project using the package:
 
 ```bash
+npx create-nrtgmp-app my-nrtgmp-app
+```
+
+Navigate to the project directory and run the development server:
+
+```bash
+cd my-nrtgmp-app
 npm run dev
 ```
 
