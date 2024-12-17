@@ -153,7 +153,6 @@ module.exports = {
 }
 ```
 
-
 #### In API Routes
 
 Datasources can be accessed by importing `@/mongodb/datasources.js` or `@/sequelize/datasources.js`.
@@ -170,7 +169,6 @@ export async function GET(request) {
     });
 }
 ```
-
 
 ### Adding Datasources
 
@@ -338,10 +336,154 @@ module.exports = {
 }
 ```
 
+# Connecting to Apollo Client
+
+All things are there in this documentation but if you want to explore more 
+you can refer [Refrence for ApolloClient](https://www.apollographql.com/docs/react/get-started)
+
+The naive example is shown in app/layout.js
+add 'use client'
+
+```javascript
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+
+// adding the client route adding here default ones 
+const client = new ApolloClient({
+  uri: 'http://localhost:3000/graphql',
+  cache: new InMemoryCache(),
+});
+
+// Wrapp in this fashion
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased dark`}
+      >
+        {/* Wrapping the Apollo client for the HomePage */}
+        <ApolloProvider client={client}>
+          {children}
+        </ApolloProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+### Using Queries and Mutation on the client side 
+
+You should add the import as shown you can choose between useMutation and useQuery as per your need
+
+```javascript
+import { useMutation, useQuery, gql } from '@apollo/client';
+```
+
+### For Query
+
+First of all add the Query 
+```javascript
+const QUERY_NAME = gql`
+  query GetLocations {
+    locations {
+      id
+      name
+      description
+      photo
+    }
+  }
+`;
+```
+
+After the setting the query add this inside of your function 
+
+```javascript
+const { loading, error, data } = useQuery(QUERY_NAME);
+
+if (loading) return <p>Loading...</p>;
+if (error) return <p>Error : {error.message}</p>;
+```
+
+Now you are ready you can map and display the data as per your need
+
+### For Mutation 
+
+First of all add the Mutation query 
+
+```javascript
+const ADDLIKE = gql`
+  mutation Mutation($addLikeId: Int!) {
+  addLike(id: $addLikeId) {
+    username
+    likes
+    id
+    description
+    comments {
+      username
+      likes
+      id
+      description
+    }
+  }
+}
+`;
+```
+Then add the following inside your function 
+
+```javascript
+const [addLike, { data, loading, error }] = useMutation(ADDLIKE);
+if (loading) return 'Submitting...';
+if (error) return `Submission error! ${error.message}`;
+```
+
+# If there are variable for input 
+
+Then simply follow this for both query as well as mutation.
+
+eg : I'm taking the mutation from above mutation query refer that, you can follow for query as well. 
+
+```javascript
+const [addLike, { data, loading, error }] = useMutation(ADDLIKE);
+
+//Let's assume we're performing onClick on the button and function is handleLikes and it needs id
+// This function is also inside the function and here I'm giving default value you can pass variable instead
+const handleLikes = () => {
+  addLike({
+    variables : {
+      addLikeId: 1
+    }
+  })
+}
+```
+
 
 ## Shadcn Components
 
-Shadcn components are set up in this repository. More information on how to use them will be added later.
+Let's say you want to add a Button but it is already setup 
+Visit this website [ShadCn](https://ui.shadcn.com/docs/components/accordion)
+
+Here I'll get the following for the button 
+
+```javascript
+npx shadcn@latest add button
+```
+As it is already setup you'll see the components directory in the root 
+You can modify that as well after installing.
+
+You can simply import the component as follows 
+```javascript
+import { Button } from "@/components/ui/button"
+```
+
+We're ready to use it 
+```javascript
+<Button variant="outline">Button</Button>
+<Button variant="destructive">Button</Button>
+<Button variant="default">Button</Button>
+<Button variant="secondary">Button</Button>
+<Button variant="ghost">Button</Button>
+<Button variant="link">Button</Button>
+```
+You can also modify them by easy TailwindCss change
 
 ## Scripts
 
